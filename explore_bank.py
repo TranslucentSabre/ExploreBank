@@ -152,4 +152,19 @@ class ExploreBank(object):
          self.notif_string = "This Scan is not in our current system, no value added."
          return False
 
+   def sellData(self, event):
+      ''' This event MUST have the 'Systems', and 'BaseValue' keys present '''
+      output = []
+      ourValue = 0
+      for system in event['Systems']:
+         if system in self.exploreBank:
+            ourValue += self.exploreBank[system]
+            del self.exploreBank[system]
+         else:
+            output.append("System \"{}\" not in bank".format(system))
+
+      percentage = (float(ourValue)/event['BaseValue']) * 100
+      output.append('Banked value is {:.2f}% of reported base value.'.format(percentage))
+      self.notif_string = "\n".join(output)
+
 
