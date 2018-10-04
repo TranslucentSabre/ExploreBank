@@ -2,7 +2,7 @@
 #
 # Class and values used to maintain current value estimate
 #
-import io, os, json
+import os, json
 
 
 #Indices
@@ -167,4 +167,33 @@ class ExploreBank(object):
       output.append('Banked value is {:.2f}% of reported base value.'.format(percentage))
       self.notif_string = "\n".join(output)
 
+   def scanBody(self, event):
+      ''' This event MUST have the 'ScanType' key present and at least one of 'StarType' or 'PlanetClass' 
+          defined. 'TerraformState' will also be checked '''
+      bodyType = ""
+      if 'StarType' in event:
+         bodyType = event['StarType']
+      elif 'PlanetClass' in event:
+         bodyType = event['PlanetClass']
+      else:
+         notif_string = "Body unidentifiable"
+         return False
+
+      terraformVal = "Terraformable"
+      if ('TerraformType' in event) and (event['TerraformType'] == terraformVal):
+         bodyType = terraformVal + " " + bodyType
+
+      scanTypeIndex = BASIC_INDEX
+      if event['ScanType'] == "Detailed":
+         scanTypeIndex = DETAILED_INDEX
+
+      # Check BodyName again currentSystemName?
+
+      try:
+         # We remove the value that probably added during the honk, that seems to be the most likely scenario
+         self.exploreBank[self.currentSystemName] += (BODIES[bodyType][scanTypeIndex] - self.honkValue)
+         return True
+      except IndexError:
+         notif_error = "No value for \"{}\"".format(bodyType)
+         return False
 
