@@ -106,3 +106,7 @@ venv.bak/
 # Tags
 csctags*
 tags
+
+# Extra
+ExploreBank.json
+*.swp
