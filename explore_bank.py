@@ -98,7 +98,7 @@ BODIES = {
 
 class ExploreBank(object):
    
-   def __init__(self):
+   def __init__(self, readLater=False):
       self.honkValue = 500
 
       self.currentSystemName = ""
@@ -107,7 +107,8 @@ class ExploreBank(object):
       self.hardBankName = os.path.join(os.path.dirname(__file__), "ExploreBank.json")
       self.exploreBank = {}
       self.notif_string = ""
-      self.readHardBank()
+      if not readLater:
+         self.readHardBank()
 
    def readHardBank(self):
       try:
@@ -146,10 +147,10 @@ class ExploreBank(object):
          systemValue = self.exploreBank.get(self.currentSystemName, 0)
          systemValue += event['Bodies'] * self.honkValue
          self.exploreBank[self.currentSystemName] = systemValue
-         self.notif_string = "Discovery Scan in {}".format(self.currentSystemName)
+         self.notif_string = "Discovery scan in {}".format(self.currentSystemName)
          return True
       else:
-         self.notif_string = "This Scan is not in our current system, no value added."
+         self.notif_string = "This scan is not in our current system, no value added."
          return False
 
    def sellData(self, event):
@@ -168,8 +169,8 @@ class ExploreBank(object):
       self.notif_string = "\n".join(output)
 
    def scanBody(self, event):
-      ''' This event MUST have the 'ScanType' key present and at least one of 'StarType' or 'PlanetClass' 
-          defined. 'TerraformState' will also be checked '''
+      ''' This event MUST have the 'ScanType' and 'Bodyname' keys present and at least one of 
+          'StarType' or 'PlanetClass' defined. 'TerraformState' will also be checked '''
       bodyType = ""
       if 'StarType' in event:
          bodyType = event['StarType']
@@ -190,10 +191,13 @@ class ExploreBank(object):
       # Check BodyName again currentSystemName?
 
       try:
+         systemValue = self.exploreBank.get(self.currentSystemName, 0)
          # We remove the value that probably added during the honk, that seems to be the most likely scenario
-         self.exploreBank[self.currentSystemName] += (BODIES[bodyType][scanTypeIndex] - self.honkValue)
+         systemValue += (BODIES[bodyType][scanTypeIndex] - self.honkValue)
+         self.exploreBank[self.currentSystemName] = systemValue
+         self.notif_string = "Added {} to bank for \"{}\"".format(BODIES[bodyType][scanTypeIndex], event['Bodyname'])
          return True
       except IndexError:
-         notif_error = "No value for \"{}\"".format(bodyType)
+         self.notif_string = "No value for \"{}\"".format(bodyType)
          return False
 
