@@ -162,7 +162,7 @@ class ExploreBank(object):
             ourValue += self.exploreBank[system]
             del self.exploreBank[system]
          else:
-            output.append("System \"{}\" not in bank".format(system))
+            output.append('System "{}" not in bank'.format(system))
 
       percentage = (float(ourValue)/event['BaseValue']) * 100
       output.append('Banked value is {:.2f}% of reported base value.'.format(percentage))
@@ -177,7 +177,7 @@ class ExploreBank(object):
       elif 'PlanetClass' in event:
          bodyType = event['PlanetClass']
       else:
-         notif_string = "Body unidentifiable"
+         self.notif_string = 'Body "{}" unidentifiable'.format(event['Bodyname'])
          return False
 
       terraformVal = "Terraformable"
@@ -195,9 +195,9 @@ class ExploreBank(object):
          # We remove the value that probably added during the honk, that seems to be the most likely scenario
          systemValue += (BODIES[bodyType][scanTypeIndex] - self.honkValue)
          self.exploreBank[self.currentSystemName] = systemValue
-         self.notif_string = "Added {} to bank for \"{}\"".format(BODIES[bodyType][scanTypeIndex], event['Bodyname'])
+         self.notif_string = 'Added {} to bank for "{}"'.format(BODIES[bodyType][scanTypeIndex], event['Bodyname'])
          return True
-      except IndexError:
-         self.notif_string = "No value for \"{}\"".format(bodyType)
+      except KeyError:
+         self.notif_string = 'No value for "{}"'.format(bodyType)
          return False
 

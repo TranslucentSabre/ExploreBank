@@ -79,6 +79,268 @@ class exploreBankTest(unittest.TestCase):
       self.assertEqual(782, self.bank.getTotalValue())
       self.assertEqual('Added 1282 to bank for "Frey A"', self.bank.notif_string)
 
+   def test_scan_star_detailed(self):
+      locationEvent = {'StarSystem': 'Frey', 'SystemAddress': 234987234659}      
+      self.bank.setLocation(locationEvent)
+      discoveryEvent = {'SystemAddress': locationEvent['SystemAddress'], 'Bodies' : 14}
+      self.assertTrue(self.bank.honk(discoveryEvent))
+      scanEvent = {'Bodyname': 'Frey A', 'ScanType': 'Detailed', 'StarType': 'AeBe'}
+      self.assertTrue(self.bank.scanBody(scanEvent))
+      # Remove honk value (even though we don't have a honk here)
+      self.assertEqual(9577, self.bank.getTotalValue())
+      self.assertEqual('Added 3077 to bank for "Frey A"', self.bank.notif_string)
+
+   def test_scan_star_bad_star_type(self):
+      locationEvent = {'StarSystem': 'Frey', 'SystemAddress': 234987234659}      
+      self.bank.setLocation(locationEvent)
+      discoveryEvent = {'SystemAddress': locationEvent['SystemAddress'], 'Bodies' : 14}
+      self.assertTrue(self.bank.honk(discoveryEvent))
+      scanEvent = {'Bodyname': 'Frey A', 'ScanType': 'Detailed', 'StarType': 'AeBe', 'TerraformType': 'Terraformable'}
+      self.assertFalse(self.bank.scanBody(scanEvent))
+      # Ensure it's still just honk value
+      self.assertEqual(7000, self.bank.getTotalValue())
+      self.assertEqual('No value for "Terraformable AeBe"', self.bank.notif_string)
+
+   def test_scan_planet_basic_non_terra(self):
+      locationEvent = {'StarSystem': 'Frey', 'SystemAddress': 234987234659}      
+      self.bank.setLocation(locationEvent)
+      scanEvent = {'Bodyname': 'Frey A 2', 'ScanType': 'Basic', 'PlanetClass': 'Water world'}
+      self.assertTrue(self.bank.scanBody(scanEvent))
+      # Remove honk value (even though we don't have a honk here)
+      self.assertEqual(125087, self.bank.getTotalValue())
+      self.assertEqual('Added 125587 to bank for "Frey A 2"', self.bank.notif_string)
+
+   def test_scan_planet_detailed_non_terra(self):
+      locationEvent = {'StarSystem': 'Frey', 'SystemAddress': 234987234659}      
+      self.bank.setLocation(locationEvent)
+      discoveryEvent = {'SystemAddress': locationEvent['SystemAddress'], 'Bodies' : 14}
+      self.assertTrue(self.bank.honk(discoveryEvent))
+      scanEvent = {'Bodyname': 'Frey A 2', 'ScanType': 'Detailed', 'PlanetClass': 'Water world'}
+      self.assertTrue(self.bank.scanBody(scanEvent))
+      # Remove honk value 
+      self.assertEqual(307910, self.bank.getTotalValue())
+      self.assertEqual('Added 301410 to bank for "Frey A 2"', self.bank.notif_string)
+
+   def test_scan_planet_basic_terra(self):
+      locationEvent = {'StarSystem': 'Frey', 'SystemAddress': 234987234659}      
+      self.bank.setLocation(locationEvent)
+      scanEvent = {'Bodyname': 'Frey A 2', 'ScanType': 'Basic', 'PlanetClass': 'Water world', 'TerraformType': 'Terraformable'}
+      self.assertTrue(self.bank.scanBody(scanEvent))
+      # Remove honk value (even though we don't have a honk here)
+      self.assertEqual(289087, self.bank.getTotalValue())
+      self.assertEqual('Added 289587 to bank for "Frey A 2"', self.bank.notif_string)
+
+   def test_scan_planet_detailed_terra(self):
+      locationEvent = {'StarSystem': 'Frey', 'SystemAddress': 234987234659}      
+      self.bank.setLocation(locationEvent)
+      discoveryEvent = {'SystemAddress': locationEvent['SystemAddress'], 'Bodies' : 14}
+      self.assertTrue(self.bank.honk(discoveryEvent))
+      scanEvent = {'Bodyname': 'Frey A 2', 'ScanType': 'Detailed', 'PlanetClass': 'Water world', 'TerraformType': 'Terraformable'}
+      self.assertTrue(self.bank.scanBody(scanEvent))
+      # Remove honk value 
+      self.assertEqual(701471, self.bank.getTotalValue())
+      self.assertEqual('Added 694971 to bank for "Frey A 2"', self.bank.notif_string)
+
+   def test_scan_planet_bad_planet_class(self):
+      locationEvent = {'StarSystem': 'Frey', 'SystemAddress': 234987234659}      
+      self.bank.setLocation(locationEvent)
+      discoveryEvent = {'SystemAddress': locationEvent['SystemAddress'], 'Bodies' : 14}
+      self.assertTrue(self.bank.honk(discoveryEvent))
+      scanEvent = {'Bodyname': 'Frey A 2', 'ScanType': 'Detailed', 'PlanetClass': 'TWW'}
+      self.assertFalse(self.bank.scanBody(scanEvent))
+      # Ensure it's still just honk value
+      self.assertEqual(7000, self.bank.getTotalValue())
+      self.assertEqual('No value for "TWW"', self.bank.notif_string)
+
+   def test_scan_no_type_or_class(self):
+      locationEvent = {'StarSystem': 'Frey', 'SystemAddress': 234987234659}      
+      self.bank.setLocation(locationEvent)
+      scanEvent = {'Bodyname': 'Frey A 2', 'ScanType': 'Basic', 'PlanetClasses': 'Water world'}
+      self.assertFalse(self.bank.scanBody(scanEvent))
+      self.assertEqual(0, self.bank.getTotalValue())
+      self.assertEqual('Body "Frey A 2" unidentifiable', self.bank.notif_string)
+
+   def test_scan_multiple_systems(self):
+      # a
+      #------
+      # 5 discovery - 2500
+      # K Star, basic - 1216
+      # Helium gas giant - 986
+      # Metal rich body - 27102 
+      #
+      # b
+      #------
+      # 10 discovery - 5000
+      # M Star, basic - 1208
+      # Earthlike body  - 261619
+      # Water giant - 760
+      #
+      # c
+      #------
+      # 2 discovery - 1000
+      # N(eutron) star, basic - 22814
+      # Terraformable High metal content body - 171770
+      verifyDict = {'a': 30304, 'b': 267087, 'c': 194584}
+      self.bank.setLocation({'StarSystem': 'a', 'SystemAddress': 1})
+      self.assertTrue(self.bank.honk({'SystemAddress': 1, 'Bodies' : 5}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'a', 'ScanType': 'Basic', 'StarType': 'K'}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'a 2', 'ScanType': 'Basic', 'PlanetClass': 'Helium gas giant'}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'a 3', 'ScanType': 'Basic', 'PlanetClass': 'Metal rich body'}))
+
+      self.bank.setLocation({'StarSystem': 'b', 'SystemAddress': 1})
+      self.assertTrue(self.bank.honk({'SystemAddress': 1, 'Bodies' : 10}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'b', 'ScanType': 'Basic', 'StarType': 'M'}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'b 4', 'ScanType': 'Basic', 'PlanetClass': 'Earthlike body'}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'b 8', 'ScanType': 'Basic', 'PlanetClass': 'Water giant'}))
+
+      self.bank.setLocation({'StarSystem': 'c', 'SystemAddress': 1})
+      self.assertTrue(self.bank.honk({'SystemAddress': 1, 'Bodies' : 2}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'c', 'ScanType': 'Basic', 'StarType': 'N'}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'c 1', 'ScanType': 'Basic', 'PlanetClass': 'Terraformable High metal content body'}))
+
+      self.assertEqual(verifyDict, self.bank.exploreBank)
+      self.assertEqual(sum(verifyDict.values()), self.bank.getTotalValue())
+
+   def test_sell_all_systems(self):
+      # a
+      #------
+      # 5 discovery - 2500
+      # K Star, basic - 1216
+      # Helium gas giant - 986
+      # Metal rich body - 27102 
+      #
+      # b
+      #------
+      # 10 discovery - 5000
+      # M Star, basic - 1208
+      # Earthlike body  - 261619
+      # Water giant - 760
+      #
+      # c
+      #------
+      # 2 discovery - 1000
+      # N(eutron) star, basic - 22814
+      # Terraformable High metal content body - 171770
+      verifyDict = {'a': 30304, 'b': 267087, 'c': 194584}
+      self.bank.setLocation({'StarSystem': 'a', 'SystemAddress': 1})
+      self.assertTrue(self.bank.honk({'SystemAddress': 1, 'Bodies' : 5}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'a', 'ScanType': 'Basic', 'StarType': 'K'}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'a 2', 'ScanType': 'Basic', 'PlanetClass': 'Helium gas giant'}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'a 3', 'ScanType': 'Basic', 'PlanetClass': 'Metal rich body'}))
+
+      self.bank.setLocation({'StarSystem': 'b', 'SystemAddress': 1})
+      self.assertTrue(self.bank.honk({'SystemAddress': 1, 'Bodies' : 10}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'b', 'ScanType': 'Basic', 'StarType': 'M'}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'b 4', 'ScanType': 'Basic', 'PlanetClass': 'Earthlike body'}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'b 8', 'ScanType': 'Basic', 'PlanetClass': 'Water giant'}))
+
+      self.bank.setLocation({'StarSystem': 'c', 'SystemAddress': 1})
+      self.assertTrue(self.bank.honk({'SystemAddress': 1, 'Bodies' : 2}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'c', 'ScanType': 'Basic', 'StarType': 'N'}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'c 1', 'ScanType': 'Basic', 'PlanetClass': 'Terraformable High metal content body'}))
+
+      self.assertEqual(verifyDict, self.bank.exploreBank)
+      self.assertEqual(sum(verifyDict.values()), self.bank.getTotalValue())
+
+      self.bank.sellData({'Systems': ['a','b','c'], 'BaseValue': 500000})
+      self.assertEqual('Banked value is 98.39% of reported base value.', self.bank.notif_string)
+
+   def test_sell_some_systems(self):
+      # a
+      #------
+      # 5 discovery - 2500
+      # K Star, basic - 1216
+      # Helium gas giant - 986
+      # Metal rich body - 27102 
+      #
+      # b
+      #------
+      # 10 discovery - 5000
+      # M Star, basic - 1208
+      # Earthlike body  - 261619
+      # Water giant - 760
+      #
+      # c
+      #------
+      # 2 discovery - 1000
+      # N(eutron) star, basic - 22814
+      # Terraformable High metal content body - 171770
+      verifyDict = {'a': 30304, 'b': 267087, 'c': 194584}
+      self.bank.setLocation({'StarSystem': 'a', 'SystemAddress': 1})
+      self.assertTrue(self.bank.honk({'SystemAddress': 1, 'Bodies' : 5}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'a', 'ScanType': 'Basic', 'StarType': 'K'}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'a 2', 'ScanType': 'Basic', 'PlanetClass': 'Helium gas giant'}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'a 3', 'ScanType': 'Basic', 'PlanetClass': 'Metal rich body'}))
+
+      self.bank.setLocation({'StarSystem': 'b', 'SystemAddress': 1})
+      self.assertTrue(self.bank.honk({'SystemAddress': 1, 'Bodies' : 10}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'b', 'ScanType': 'Basic', 'StarType': 'M'}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'b 4', 'ScanType': 'Basic', 'PlanetClass': 'Earthlike body'}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'b 8', 'ScanType': 'Basic', 'PlanetClass': 'Water giant'}))
+
+      self.bank.setLocation({'StarSystem': 'c', 'SystemAddress': 1})
+      self.assertTrue(self.bank.honk({'SystemAddress': 1, 'Bodies' : 2}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'c', 'ScanType': 'Basic', 'StarType': 'N'}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'c 1', 'ScanType': 'Basic', 'PlanetClass': 'Terraformable High metal content body'}))
+
+      self.assertEqual(verifyDict, self.bank.exploreBank)
+      self.assertEqual(sum(verifyDict.values()), self.bank.getTotalValue())
+
+      self.bank.sellData({'Systems': ['a','b'], 'BaseValue': 350000})
+      self.assertEqual('Banked value is 84.97% of reported base value.', self.bank.notif_string)
+      self.assertEqual({'c':verifyDict['c']}, self.bank.exploreBank)
+      self.assertEqual(verifyDict['c'], self.bank.getTotalValue())
+
+   def test_sell_no_systems(self):
+      # a
+      #------
+      # 5 discovery - 2500
+      # K Star, basic - 1216
+      # Helium gas giant - 986
+      # Metal rich body - 27102 
+      #
+      # b
+      #------
+      # 10 discovery - 5000
+      # M Star, basic - 1208
+      # Earthlike body  - 261619
+      # Water giant - 760
+      #
+      # c
+      #------
+      # 2 discovery - 1000
+      # N(eutron) star, basic - 22814
+      # Terraformable High metal content body - 171770
+      verifyDict = {'a': 30304, 'b': 267087, 'c': 194584}
+      self.bank.setLocation({'StarSystem': 'a', 'SystemAddress': 1})
+      self.assertTrue(self.bank.honk({'SystemAddress': 1, 'Bodies' : 5}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'a', 'ScanType': 'Basic', 'StarType': 'K'}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'a 2', 'ScanType': 'Basic', 'PlanetClass': 'Helium gas giant'}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'a 3', 'ScanType': 'Basic', 'PlanetClass': 'Metal rich body'}))
+
+      self.bank.setLocation({'StarSystem': 'b', 'SystemAddress': 1})
+      self.assertTrue(self.bank.honk({'SystemAddress': 1, 'Bodies' : 10}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'b', 'ScanType': 'Basic', 'StarType': 'M'}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'b 4', 'ScanType': 'Basic', 'PlanetClass': 'Earthlike body'}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'b 8', 'ScanType': 'Basic', 'PlanetClass': 'Water giant'}))
+
+      self.bank.setLocation({'StarSystem': 'c', 'SystemAddress': 1})
+      self.assertTrue(self.bank.honk({'SystemAddress': 1, 'Bodies' : 2}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'c', 'ScanType': 'Basic', 'StarType': 'N'}))
+      self.assertTrue(self.bank.scanBody({'Bodyname': 'c 1', 'ScanType': 'Basic', 'PlanetClass': 'Terraformable High metal content body'}))
+
+      self.assertEqual(verifyDict, self.bank.exploreBank)
+      self.assertEqual(sum(verifyDict.values()), self.bank.getTotalValue())
+
+      self.bank.sellData({'Systems': ['e','f','g'], 'BaseValue': 500000})
+      checkString = "\n".join(
+         ['System "e" not in bank',
+          'System "f" not in bank',
+          'System "g" not in bank',
+          'Banked value is 0.00% of reported base value.'])
+      self.assertEqual(checkString, self.bank.notif_string)
+
+      
 
 if __name__ == "__main__":
     unittest.main()
