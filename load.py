@@ -107,13 +107,13 @@ def display_event():
    this.events['text'] = this.bank.notif_string
 
 def update_visibility(visibility):
-   if eventsVis == "Y":
+   if visibility == "Y":
       this.events.grid(row = 1, column = 0, columnspan = 2)
    else:
       this.events.grid_forget()
 
-def get_setting():
-   honk = config.getInt("eb-honkVal")
+def get_settings():
+   honk = config.getint("eb-honkVal")
    event = config.get("eb-eventVis")
    if honk == 0:
       honk = DEF_HONK
