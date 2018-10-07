@@ -24,7 +24,7 @@ this.value = None
 this.events = None
 
 # Used during preferences
-this.settings = None
+this.settings = []
 
 
 def plugin_start():
@@ -48,6 +48,8 @@ def plugin_app(parent):
 
    this.bank = eb.ExploreBank()
    this.bank.honkValue = settings[0]
+   display_value()
+   display_event()
    return this.frame
 
 def plugin_prefs(parent, cmdr, is_beta):
@@ -56,7 +58,7 @@ def plugin_prefs(parent, cmdr, is_beta):
 
     nb.Label(frame, text = 'Value for each body in a discovery scan:').grid(row = 0, column = 0, padx = 10, pady = (10,0))
     var = tk.StringVar(value = settings[0])
-    nb.Entry(frame, textvariable=var1).grid(row = 0, column = 1)
+    nb.Entry(frame, textvariable=var).grid(row = 0, column = 1)
     this.settings.append(var)
 
     var = tk.StringVar(value = settings[1])
@@ -101,7 +103,7 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
     display_event()
 
 def display_value():
-   this.value['text'] = "{:,n}".format(this.bank.getTotalValue())
+   this.value['text'] = "{:,}".format(this.bank.getTotalValue())
 
 def display_event():
    this.events['text'] = this.bank.notif_string
