@@ -116,7 +116,7 @@ class ExploreBank(object):
             self.exploreBank = json.load(hardBank)
             self.notif_string = "Read saved bank."
       except IOError:
-         self.notif_string = "No saved, starting over."
+         self.notif_string = "No saved bank, starting over."
 
    def writeHardBank(self):
       try:

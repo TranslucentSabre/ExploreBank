@@ -41,7 +41,8 @@ def plugin_app(parent):
    this.frame = tk.Frame(parent)
    #this.frame.columnconfigure(3, weight=1)
    nb.Label(frame, text = 'Approx. Value Banked:').grid(row = 0, column = 0, sticky=tk.W)
-   this.value = nb.Label(frame).grid(row = 0, column = 1)
+   this.value = nb.Label(frame)
+   this.value.grid(row = 0, column = 1)
    this.events = nb.Label(frame)
    settings = get_settings()
    update_visibility(settings[1])
@@ -56,14 +57,16 @@ def plugin_prefs(parent, cmdr, is_beta):
     frame = nb.Frame(parent)
     settings = get_settings()
 
-    nb.Label(frame, text = 'Value for each body in a discovery scan:').grid(row = 0, column = 0, padx = 10, pady = (10,0))
-    var = tk.StringVar(value = settings[0])
-    nb.Entry(frame, textvariable=var).grid(row = 0, column = 1)
-    this.settings.append(var)
+    if this.settings == []:
+        this.settings = [tk.StringVar(), tk.StringVar()]
 
-    var = tk.StringVar(value = settings[1])
-    nb.Checkbutton(frame, text='Display plugin events.', variable=var, onvalue='Y', offvalue='N').grid(row = 1, column = 0, columnspan = 2)
-    this.settings.append(var)
+    nb.Label(frame, text = 'Value for each body in a discovery scan:').grid(row = 0, column = 0, padx = 10, pady = (10,0))
+    this.settings[0].set(settings[0])
+    nb.Entry(frame, textvariable=this.settings[0]).grid(row = 0, column = 1, pady = (10,0))
+
+    this.settings[1].set(settings[1])
+    nb.Checkbutton(frame, text='Display plugin events.', variable=this.settings[1], 
+                          onvalue='Y', offvalue='N').grid(row = 1, column = 0, columnspan = 2, padx = 10, sticky = tk.W)
 
     nb.Label(frame, text = 'Version {}'.format(VERSION)).grid(padx = 10, pady = 10, sticky=tk.W)
 
@@ -110,7 +113,7 @@ def display_event():
 
 def update_visibility(visibility):
    if visibility == "Y":
-      this.events.grid(row = 1, column = 0, columnspan = 2)
+      this.events.grid(row = 1, column = 0, columnspan = 2, sticky = tk.W)
    else:
       this.events.grid_forget()
 
