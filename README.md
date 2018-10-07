@@ -2,9 +2,9 @@
 This is an EDMC plugin to show approximate profit from scanned celestial bodies. 
 
 ## Screenshots
-![First time start](img/freshStart.png)
-![Reload with data](img/reload.png)
-![Configuration](img/config.png)
+![First time start](img/freshStart.PNG)
+![Reload with data](img/reload.PNG)
+![Configuration](img/config.PNG)
 
 ## Functionality 
 This plugin will keep track of discovery and surface scans to provide an estimate of the worth of the bank of exploration data gathered in Elite Dangerous. 
@@ -30,6 +30,6 @@ Examples taken from Jonathan Harris' [HabZone](https://github.com/Marginal/HabZo
 
 Copyright © 2018 Timothy Myers.
 
-Licensed under the [MIT License](https://opensource.org/license/MIT).
+Licensed under the [MIT License](https://opensource.org/licenses/MIT).
 
 
