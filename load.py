@@ -3,10 +3,10 @@
 # Display an estimate of the currently collected exploration data worth
 #
 
+import explore_bank as eb
 import sys
 
 import Tkinter as tk
-from ttkHyperlinkLabel import HyperlinkLabel
 import myNotebook as nb
 
 
@@ -14,34 +14,116 @@ from config import config
 from l10n import Locale
 
 VERSION = '0.01'
+DEF_HONK=500
+DEF_VISIBILITY='Y'
 
 this = sys.modules[__name__]	# For holding module globals
+this.bank = None
 this.frame = None
+this.value = None
+this.events = None
 
 # Used during preferences
 this.settings = None
 
 
 def plugin_start():
-    # App isn't initialised at this point so can't do anything interesting
-    return 'ExploreBank'
+   # App isn't initialised at this point so can't do anything interesting
+   return 'ExploreBank'
+
+def plugin_stop():
+   # EDMC is shutting down
+   this.bank.writeHardBank()
+   return "Stopping ExploreBank"
 
 def plugin_app(parent):
-    # Create and display widgets
-    this.frame = tk.Frame(parent)
-    this.frame.columnconfigure(3, weight=1)
-    this.spacer = tk.Frame(this.frame)	# Main frame can't be empty or it doesn't resize
-    update_visibility()
-    return this.frame
+   # Create and display widgets
+   this.frame = tk.Frame(parent)
+   #this.frame.columnconfigure(3, weight=1)
+   nb.Label(frame, text = 'Approx. Value Banked:').grid(row = 0, column = 0, sticky=tk.W)
+   this.value = nb.Label(frame).grid(row = 0, column = 1)
+   this.events = nb.Label(frame)
+   settings = get_settings()
+   update_visibility(settings[1])
+
+   this.bank = eb.ExploreBank()
+   this.bank.honkValue = settings[0]
+   return this.frame
 
 def plugin_prefs(parent, cmdr, is_beta):
-   pass
+    frame = nb.Frame(parent)
+    settings = get_settings()
+
+    nb.Label(frame, text = 'Value for each body in a discovery scan:').grid(row = 0, column = 0, padx = 10, pady = (10,0))
+    var = tk.StringVar(value = settings[0])
+    nb.Entry(frame, textvariable=var1).grid(row = 0, column = 1)
+    this.settings.append(var)
+
+    var = tk.StringVar(value = settings[1])
+    nb.Checkbutton(frame, text='Display plugin events.', variable=var, onvalue='Y', offvalue='N').grid(row = 1, column = 0, columnspan = 2)
+    this.settings.append(var)
+
+    nb.Label(frame, text = 'Version {}'.format(VERSION)).grid(padx = 10, pady = 10, sticky=tk.W)
+
+    return frame
 
 def prefs_changed(cmdr, is_beta):
-   pass
+    #This is for if the honk value is not a number
+    settings = get_settings()
+    honk = 0
+    try:
+      honk = int(this.settings[0].get())
+    except:
+      honk = settings[0]
+
+    events = this.settings[1].get()
+    settings = (honk, events)
+    set_settings(settings)
+
+    update_visibility(settings[1])
+    this.bank.honkValue = settings[0]
 
 def journal_entry(cmdr, is_beta, system, station, entry, state):
-   pass
+    if entry['event'] in ['Location', 'FSDJump']:
+       this.bank.setLocation(event)
+    elif entry['event'] == 'DiscoveryScan':
+       this.bank.honk(event)   
+    elif entry['event'] in ['Died', 'SelfDestruct']:
+       this.bank.clearBank()
+    elif entry['event'] == 'Scan':
+       this.bank.scanBody(event)
+    elif entry['event'] == 'SellExplorationData':
+       this.bank.sellData(event)
+    elif entry['event'] == 'Shutdown':
+       this.bank.writeHardBank()
 
-def update_visibility():
-   pass
+    display_value()
+    display_event()
+
+def display_value():
+   this.value['text'] = "{:,n}".format(this.bank.getTotalValue())
+
+def display_event():
+   this.events['text'] = this.bank.notif_string
+
+def update_visibility(visibility):
+   if eventsVis == "Y":
+      this.events.grid(row = 1, column = 0, columnspan = 2)
+   else:
+      this.events.grid_forget()
+
+def get_setting():
+   honk = config.getInt("eb-honkVal")
+   event = config.get("eb-eventVis")
+   if honk == 0:
+      honk = DEF_HONK
+   if event == None:
+      event = DEF_VISIBILITY
+   return (honk, event)
+
+def set_settings(settings):
+   config.set("eb-honkVal", settings[0])
+   config.set("eb-eventVis", settings[1])
+    
+
+   
