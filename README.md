@@ -12,7 +12,9 @@ The values for surface scans are based upon the image provided from Cmdr Fru for
 ![Exploration Values](https://i.redd.it/5khvftdue6ry.jpg)
 
 Approximate values come from discovery scans. There is currently no way, from the Journal, to determine more than the number of bodies picked up from the discovery scan.
-By default, this plugin will assign a value of 500 credits per body found in a discovry scan. This value can be modified.
+By default, this plugin will assign a value of 500 credits per body found in a discovery scan. This value can be modified.
+
+This plugin DOES/CAN NOT take into account first discoverer bonuses and powerplay bonuses. This tool is designed to give a number such that the CMDR using it can say "I should have at least this much banked."
 
 ## Installation
 

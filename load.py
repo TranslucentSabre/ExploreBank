@@ -13,7 +13,7 @@ import myNotebook as nb
 from config import config
 from l10n import Locale
 
-VERSION = '0.50'
+VERSION = '0.5.0'
 DEF_HONK=500
 DEF_VISIBILITY='Y'
 
