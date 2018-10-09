@@ -13,7 +13,7 @@ import myNotebook as nb
 from config import config
 from l10n import Locale
 
-VERSION = '0.6.0'
+VERSION = '0.6.1'
 DEF_HONK=500
 DEF_VISIBILITY='Y'
 
@@ -96,15 +96,15 @@ def prefs_changed(cmdr, is_beta):
 
 def journal_entry(cmdr, is_beta, system, station, entry, state):
     if entry['event'] in ['Location', 'FSDJump']:
-       this.bank.setLocation(event)
+       this.bank.setLocation(entry)
     elif entry['event'] == 'DiscoveryScan':
-       this.bank.honk(event)   
+       this.bank.honk(entry)
     elif entry['event'] in ['Died', 'SelfDestruct']:
        this.bank.clearBank()
     elif entry['event'] == 'Scan':
-       this.bank.scanBody(event)
+       this.bank.scanBody(entry)
     elif entry['event'] == 'SellExplorationData':
-       this.bank.sellData(event)
+       this.bank.sellData(entry)
     elif entry['event'] == 'Shutdown':
        this.bank.writeHardBank()
 
