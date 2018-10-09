@@ -13,7 +13,7 @@ import myNotebook as nb
 from config import config
 from l10n import Locale
 
-VERSION = '0.5.0'
+VERSION = '0.6.0'
 DEF_HONK=500
 DEF_VISIBILITY='Y'
 
@@ -62,11 +62,13 @@ def plugin_prefs(parent, cmdr, is_beta):
 
     nb.Label(frame, text = 'Value for each body in a discovery scan:').grid(row = 0, column = 0, padx = 10, pady = (10,0))
     this.settings[0].set(settings[0])
-    nb.Entry(frame, textvariable=this.settings[0]).grid(row = 0, column = 1, pady = (10,0))
+    nb.Entry(frame, textvariable=this.settings[0]).grid(row = 0, column = 1, sticky = tk.W, pady = (10,0))
 
     this.settings[1].set(settings[1])
     nb.Checkbutton(frame, text='Display plugin events.', variable=this.settings[1], 
                           onvalue='Y', offvalue='N').grid(row = 1, column = 0, columnspan = 2, padx = 10, sticky = tk.W)
+    nb.Button(frame, text="Clear Banked Data", command=this.bank.clearBank).grid(row = 2, column = 0, padx = 10, sticky = tk.W)
+    nb.Label(frame, text = "WARNING: Clearing your banked data is irreversable.").grid(row = 2, column = 1, sticky = tk.W)    
 
     nb.Label(frame, text = 'Version {}'.format(VERSION)).grid(padx = 10, pady = 10, sticky=tk.W)
 
@@ -87,6 +89,10 @@ def prefs_changed(cmdr, is_beta):
 
     update_visibility(settings[1])
     this.bank.honkValue = settings[0]
+
+    #Display our fields for the case where the bank was cleared
+    display_value()
+    display_event()
 
 def journal_entry(cmdr, is_beta, system, station, entry, state):
     if entry['event'] in ['Location', 'FSDJump']:
