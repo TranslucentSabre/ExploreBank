@@ -16,6 +16,10 @@ By default, this plugin will assign a value of 500 credits per body found in a d
 
 This plugin DOES/CAN NOT take into account first discoverer bonuses and powerplay bonuses. This tool is designed to give a number such that the CMDR using it can say "I should have at least this much banked."
 
+Unfortunately, this plugin cannot account for scans taken before the installation of this plugin. 
+
+All data is stored in a file located at `plugins/ExploreBank/ExploreBank.json` this allows for your bank to persist across Elite Dangerous and EDMC sessions.
+
 ## Installation
 
 * On EDMC's Plugins settings tab press the “Open” button. This reveals the `plugins` folder where EDMC looks for plugins.
@@ -23,6 +27,15 @@ This plugin DOES/CAN NOT take into account first discoverer bonuses and powerpla
 * Open the `.zip` archive that you downloaded and move the `ExploreBank` folder contained inside into the `plugins` folder.
 
 You will need to re-start EDMC for it to notice the new plugin.
+
+## Updating
+
+* On EDMC's Plugins settings tab press the “Open” button. This reveals the `plugins` folder where EDMC looks for plugins.
+* Download the [latest release](https://github.com/TranslucentSabre/ExploreBank/releases/latest).
+* Open the `.zip` archive that you downloaded and move the contents of the `ExploreBank` folder contained inside into the `plugins/ExploreBank` folder.
+* NOTE: Do NOT delete the exisiting file `plugins/ExploreBank/ExploreBank.json`. Doing so will remove all your banked data.
+
+You will need to re-start EDMC for it to notice the updated plugin.
 
 ## Acknowledgements
 
