@@ -169,7 +169,7 @@ class ExploreBank(object):
       self.notif_string = "\n".join(output)
 
    def scanBody(self, event):
-      ''' This event MUST have the 'ScanType' and 'Bodyname' keys present and at least one of 
+      ''' This event MUST have the 'ScanType' and 'BodyName' keys present and at least one of 
           'StarType' or 'PlanetClass' defined. 'TerraformState' will also be checked '''
       bodyType = ""
       if 'StarType' in event:
@@ -177,7 +177,7 @@ class ExploreBank(object):
       elif 'PlanetClass' in event:
          bodyType = event['PlanetClass']
       else:
-         self.notif_string = 'Body "{}" unidentifiable'.format(event['Bodyname'])
+         self.notif_string = 'Body "{}" unidentifiable'.format(event['BodyName'])
          return False
 
       terraformVal = "Terraformable"
@@ -195,7 +195,7 @@ class ExploreBank(object):
          # We remove the value that probably added during the honk, that seems to be the most likely scenario
          systemValue += (BODIES[bodyType][scanTypeIndex] - self.honkValue)
          self.exploreBank[self.currentSystemName] = systemValue
-         self.notif_string = 'Added {} to bank for "{}"'.format(BODIES[bodyType][scanTypeIndex], event['Bodyname'])
+         self.notif_string = 'Added {} to bank for "{}"'.format(BODIES[bodyType][scanTypeIndex], event['BodyName'])
          return True
       except KeyError:
          self.notif_string = 'No value for "{}"'.format(bodyType)
