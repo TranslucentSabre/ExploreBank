@@ -181,7 +181,7 @@ class ExploreBank(object):
          return False
 
       terraformVal = "Terraformable"
-      if ('TerraformType' in event) and (event['TerraformType'] == terraformVal):
+      if ('TerraformState' in event) and (event['TerraformState'] == terraformVal):
          bodyType = terraformVal + " " + bodyType
 
       scanTypeIndex = BASIC_INDEX

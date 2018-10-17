@@ -95,7 +95,7 @@ class exploreBankTest(unittest.TestCase):
       self.bank.setLocation(locationEvent)
       discoveryEvent = {'SystemAddress': locationEvent['SystemAddress'], 'Bodies' : 14}
       self.assertTrue(self.bank.honk(discoveryEvent))
-      scanEvent = {'BodyName': 'Frey A', 'ScanType': 'Detailed', 'StarType': 'AeBe', 'TerraformType': 'Terraformable'}
+      scanEvent = {'BodyName': 'Frey A', 'ScanType': 'Detailed', 'StarType': 'AeBe', 'TerraformState': 'Terraformable'}
       self.assertFalse(self.bank.scanBody(scanEvent))
       # Ensure it's still just honk value
       self.assertEqual(7000, self.bank.getTotalValue())
@@ -124,7 +124,7 @@ class exploreBankTest(unittest.TestCase):
    def test_scan_planet_basic_terra(self):
       locationEvent = {'StarSystem': 'Frey', 'SystemAddress': 234987234659}      
       self.bank.setLocation(locationEvent)
-      scanEvent = {'BodyName': 'Frey A 2', 'ScanType': 'Basic', 'PlanetClass': 'Water world', 'TerraformType': 'Terraformable'}
+      scanEvent = {'BodyName': 'Frey A 2', 'ScanType': 'Basic', 'PlanetClass': 'Water world', 'TerraformState': 'Terraformable'}
       self.assertTrue(self.bank.scanBody(scanEvent))
       # Remove honk value (even though we don't have a honk here)
       self.assertEqual(289087, self.bank.getTotalValue())
@@ -135,7 +135,7 @@ class exploreBankTest(unittest.TestCase):
       self.bank.setLocation(locationEvent)
       discoveryEvent = {'SystemAddress': locationEvent['SystemAddress'], 'Bodies' : 14}
       self.assertTrue(self.bank.honk(discoveryEvent))
-      scanEvent = {'BodyName': 'Frey A 2', 'ScanType': 'Detailed', 'PlanetClass': 'Water world', 'TerraformType': 'Terraformable'}
+      scanEvent = {'BodyName': 'Frey A 2', 'ScanType': 'Detailed', 'PlanetClass': 'Water world', 'TerraformState': 'Terraformable'}
       self.assertTrue(self.bank.scanBody(scanEvent))
       # Remove honk value 
       self.assertEqual(701471, self.bank.getTotalValue())
