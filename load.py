@@ -95,7 +95,7 @@ def prefs_changed(cmdr, is_beta):
     display_event()
 
 def journal_entry(cmdr, is_beta, system, station, entry, state):
-    this.bank.will_log(is_beta)
+    this.bank.willLog(is_beta)
 
     if entry['event'] in ['Location', 'FSDJump']:
        this.bank.setLocation(entry)

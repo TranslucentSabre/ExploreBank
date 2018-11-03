@@ -119,7 +119,7 @@ class ExploreBank(object):
    def log(self, item):
       if self.logging:
          try:
-            with open(self.eventLogName, "w") as logFile:
+            with open(self.eventLogName, "a") as logFile:
                line = str(item)
                line += "\n"
                logFile.write(line)
