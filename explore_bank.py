@@ -110,6 +110,22 @@ class ExploreBank(object):
       if not readLater:
          self.readHardBank()
 
+      self.eventLogName = os.path.join(os.path.dirname(__file__), "EventLog.txt")
+      self.logging = False
+
+   def willLog(self, logItems):
+      self.logging = logItems
+      
+   def log(self, item):
+      if self.logging:
+         try:
+            with open(self.eventLogName, "w") as logFile:
+               line = str(item)
+               line += "\n"
+               logFile.write(line)
+         except IOError:
+            pass
+
    def readHardBank(self):
       try:
          with open(self.hardBankName, "r") as hardBank:
@@ -139,22 +155,27 @@ class ExploreBank(object):
       self.currentSystemName = event['StarSystem']
       self.currentSystemAddress = event['SystemAddress']
       self.notif_string = "New system, {}, entered.".format(self.currentSystemName)
+      self.log(self.notif_string)
       return True
 
    def honk(self, event):
       ''' This event MUST have the 'SystemAddress' and 'Bodies' keys present '''
+      self.log(event)
       if event['SystemAddress'] == self.currentSystemAddress:
          systemValue = self.exploreBank.get(self.currentSystemName, 0)
          systemValue += event['Bodies'] * self.honkValue
          self.exploreBank[self.currentSystemName] = systemValue
          self.notif_string = "Discovery scan in {}".format(self.currentSystemName)
+         self.log(self.notif_string)
          return True
       else:
          self.notif_string = "This scan is not in our current system, no value added."
+         self.log(self.notif_string)
          return False
 
    def sellData(self, event):
       ''' This event MUST have the 'Systems', and 'BaseValue' keys present '''
+      self.log(event)
       output = []
       ourValue = 0
       for system in event['Systems']:
@@ -167,10 +188,12 @@ class ExploreBank(object):
       percentage = (float(ourValue)/event['BaseValue']) * 100
       output.append('Banked value is {:.2f}% of reported base value.'.format(percentage))
       self.notif_string = "\n".join(output)
+      self.log(self.notif_string)
 
    def scanBody(self, event):
       ''' This event MUST have the 'ScanType' and 'BodyName' keys present and at least one of 
           'StarType' or 'PlanetClass' defined. 'TerraformState' will also be checked '''
+      self.log(event)
       bodyType = ""
       if 'StarType' in event:
          bodyType = event['StarType']
@@ -178,6 +201,7 @@ class ExploreBank(object):
          bodyType = event['PlanetClass']
       else:
          self.notif_string = 'Body "{}" unidentifiable'.format(event['BodyName'])
+         self.log(self.notif_string)
          return False
 
       terraformVal = "Terraformable"
@@ -196,8 +220,15 @@ class ExploreBank(object):
          systemValue += (BODIES[bodyType][scanTypeIndex] - self.honkValue)
          self.exploreBank[self.currentSystemName] = systemValue
          self.notif_string = 'Added {} to bank for "{}"'.format(BODIES[bodyType][scanTypeIndex], event['BodyName'])
+         self.log(self.notif_string)
          return True
       except KeyError:
          self.notif_string = 'No value for "{}"'.format(bodyType)
+         self.log(self.notif_string)
          return False
+
+   def surfaceScan(self, event):
+      ''' This event MUST have ***** '''
+      self.log(event)
+      return True
 

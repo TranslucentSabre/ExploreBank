@@ -95,6 +95,8 @@ def prefs_changed(cmdr, is_beta):
     display_event()
 
 def journal_entry(cmdr, is_beta, system, station, entry, state):
+    this.bank.will_log(is_beta)
+
     if entry['event'] in ['Location', 'FSDJump']:
        this.bank.setLocation(entry)
     elif entry['event'] == 'DiscoveryScan':
@@ -107,6 +109,8 @@ def journal_entry(cmdr, is_beta, system, station, entry, state):
        this.bank.sellData(entry)
     elif entry['event'] == 'Shutdown':
        this.bank.writeHardBank()
+    elif entry['event'] == 'SAAScanComplete':
+      this.bank.surfaceScan(entry)
 
     display_value()
     display_event()
